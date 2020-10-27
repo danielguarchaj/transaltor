@@ -146,9 +146,9 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID') if 'AWS_ACCESS_KEY_ID' in os.environ else 'AKIATX4QHS73IE6CVFE2'
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY') if 'AWS_SECRET_ACCESS_KEY' in os.environ else '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'
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME') if 'AWS_STORAGE_BUCKET_NAME' in os.environ else 'dev-uploads-daniel'
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None

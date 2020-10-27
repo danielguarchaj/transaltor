@@ -21,6 +21,10 @@ class TranslateAPIView(APIView):
                 response['original_word'] = text
                 response['word'] = word
                 response['translation'] = translation
+                try:
+                    response['image_url'] = word.image.url
+                except:
+                    response['image_url'] = None
                 del source_alternatives[i]
                 response['source_alternatives'] = source_alternatives
                 response['target_alternatives'] = target_alternatives[1:]
@@ -37,7 +41,6 @@ class TranslateAPIView(APIView):
             elif translated_from == 2:
                 response = self.get_translation_and_alternatives(kiche_alternatives, spanish_alternatives, match, text)
             if 'word' in response:
-                print(response['word'])
                 return response
         response = 'failed-translation'
         return response
@@ -81,7 +84,6 @@ class TranslateAPIView(APIView):
             for word in words:
                 matches = Word.objects.filter(spanish__icontains=word) if translated_from == 1 else Word.objects.filter(kiche__icontains=word)
                 word_translation = self.get_translation(word, matches, translated_from)
-                print(word_translation)
                 if word_translation == 'failed-translation':
                     failed_translation = True
                     response = 'failed-translation'
