@@ -62,6 +62,9 @@ class TranslateAPIView(APIView):
                     translation = new_translation,
                     word = response['word']
                 )
+                word_object = response['word']
+                word_object.translations_count = word_object.translations_count + 1
+                word_object.save()
                 del response['word']
             elif response == 'failed-translation':
                 FailedTranslation.objects.create(
@@ -105,4 +108,7 @@ class TranslateAPIView(APIView):
                         translation = new_translation,
                         word = w
                     )
+                    word_object = w
+                    word_object.translations_count = word_object.translations_count + 1
+                    word_object.save()
         return Response(response)

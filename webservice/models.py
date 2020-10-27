@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class Word(models.Model):
     spanish = models.CharField(max_length=500)
     kiche = models.CharField(max_length=500)
-    single_translations_count = models.IntegerField(default=0)
+    translations_count = models.IntegerField(default=0)
     image = models.ImageField(upload_to='traductor/palabras_imagenes/', null=True, blank=True)
 
     def __str__(self):
