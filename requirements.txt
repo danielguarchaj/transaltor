@@ -1,5 +1,7 @@
 Django
 djangorestframework
+django-heroku
+django-extensions
 django-filter
 djangorestframework_simplejwt
 django-cors-headers
