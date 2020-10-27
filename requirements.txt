@@ -1,0 +1,8 @@
+Django
+djangorestframework
+django-filter
+djangorestframework_simplejwt
+django-cors-headers
+pillow
+django-storages
+boto3
