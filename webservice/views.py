@@ -241,24 +241,24 @@ class TranslateAPIView(APIView):
         return Response(response)
 
 
-# import openpyxl
-# from pathlib import Path
+import openpyxl
+from pathlib import Path
 
 
-# def upload_dictionary(request):
-#     # Setting the path to the xlsx file:
-#     xlsx_file = Path('diccionario.xlsx')
+def upload_dictionary(request):
+    # Setting the path to the xlsx file:
+    xlsx_file = Path('diccionario.xlsx')
 
-#     wb_obj = openpyxl.load_workbook(xlsx_file)
-#     wsheet = wb_obj.active
+    wb_obj = openpyxl.load_workbook(xlsx_file)
+    wsheet = wb_obj.active
 
-#     col_kiche = 'A'
-#     col_spanish = 'B'
+    col_kiche = 'A'
+    col_spanish = 'B'
 
-#     row = 1
-#     while row < 85:
-#         Word.objects.create(
-#             spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip(),
-#             kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip(),
-#         )
-#         row += 1
+    row = 1
+    while row < 85:
+        Word.objects.create(
+            spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip(),
+            kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip(),
+        )
+        row += 1
