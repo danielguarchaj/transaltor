@@ -50,6 +50,7 @@ class Translation(models.Model):
 class WordTranslated(models.Model):
     translation = models.ForeignKey(Translation, on_delete=models.CASCADE, related_name='words_translated')
     word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name='translations')
+    user_age = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.word.spanish} - {self.word.kiche}'

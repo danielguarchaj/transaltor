@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from .models import (
@@ -8,15 +9,64 @@ from .models import (
     FailedTranslation,
 )
 
+from .paginations import (
+    DefaultPagination
+)
+
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.parser import parse
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, FailedTranslationSerializer, WordSerializer
 
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+from django.db.models import Sum, Count
+
+from rest_framework.permissions import IsAuthenticated
+
+class TopTenTranslatedWordsAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    def get(self, request, *args, **kwargs):
+        query_params = self.request.query_params
+
+        if 'age' in query_params:
+            qs = WordTranslated.objects.filter(user_age=int(query_params['age']))\
+                    .values('word__kiche', 'word__spanish') \
+                    .annotate(translations=Count('word')) \
+                    .order_by('-translations')[:10]
+        elif 'lt_age' in query_params:
+            qs = WordTranslated.objects.filter(user_age__lt=int(query_params['lt_age']))\
+                    .values('word__kiche', 'word__spanish') \
+                    .annotate(translations=Count('word')) \
+                    .order_by('-translations')[:10]
+        elif 'gt_age' in query_params:
+            qs = WordTranslated.objects.filter(user_age__gt=int(query_params['gt_age']))\
+                    .values('word__kiche', 'word__spanish') \
+                    .annotate(translations=Count('word')) \
+                    .order_by('-translations')[:10]
+        else:
+            qs = WordTranslated.objects.values('word__kiche', 'word__spanish') \
+                    .annotate(translations=Count('word')) \
+                    .order_by('-translations')[:10]
+
+        return Response(list(qs))
+
+
+class FailedTranslationsListAPIView(ListAPIView):
+    serializer_class = FailedTranslationSerializer
+    permission_classes = (IsAuthenticated, )
+    queryset = FailedTranslation.objects.all()
+    pagination_class = DefaultPagination
+
+
+class WordListAPIView(ListAPIView):
+    serializer_class = WordSerializer
+    permission_classes = (IsAuthenticated, )
+    queryset = Word.objects.all()
+    pagination_class = DefaultPagination
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -73,6 +123,13 @@ class UserAPIView(APIView):
 
 
 class TranslateAPIView(APIView):
+    def get_user_age(self, birth_date):
+        if birth_date is None:
+            return 0
+        today = date.today()
+        age =  today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+        return age
+
     def get_translation_and_alternatives(self, source_alternatives, target_alternatives, match, text):
         response = {}
         for i in range(len(source_alternatives)):    
@@ -112,6 +169,11 @@ class TranslateAPIView(APIView):
         text = request.data['text']
         single_word = request.data['single_word']
         user = request.user if request.user.is_authenticated else None
+        try:
+            user_birth_date = user.profile.birth_date
+        except:
+            user_birth_date = None
+        user_age = self.get_user_age(user_birth_date)
         if single_word:
             matches = Word.objects.filter(spanish__icontains=text) if translated_from == 1 else Word.objects.filter(kiche__icontains=text) 
             response = self.get_translation(text, matches, translated_from)
@@ -124,7 +186,8 @@ class TranslateAPIView(APIView):
                 )
                 word_translated = WordTranslated.objects.create(
                     translation = new_translation,
-                    word = response['word']
+                    word = response['word'],
+                    user_age = user_age
                 )
                 word_object = response['word']
                 word_object.translations_count = word_object.translations_count + 1
@@ -169,7 +232,8 @@ class TranslateAPIView(APIView):
                 for w in translated_words:
                     word_translated = WordTranslated.objects.create(
                         translation = new_translation,
-                        word = w
+                        word = w,
+                        user_age = user_age
                     )
                     word_object = w
                     word_object.translations_count = word_object.translations_count + 1
@@ -181,7 +245,7 @@ class TranslateAPIView(APIView):
 # from pathlib import Path
 
 
-# def upload_dictionarie(request):
+# def upload_dictionary(request):
 #     # Setting the path to the xlsx file:
 #     xlsx_file = Path('diccionario.xlsx')
 
