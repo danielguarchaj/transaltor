@@ -9,6 +9,67 @@ from .models import (
 )
 
 from django.contrib.auth.models import User
+from datetime import datetime
+from dateutil.parser import parse
+
+from .serializers import UserSerializer
+
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        user_serializer = UserSerializer(user)
+        token['user'] = user_serializer.data
+        return token
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class UserAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        required_fields = ['username', 'first_name', 'last_name', 'password', 'birth_date']
+        missing_fields = []
+        for field in required_fields:
+            if field not in request.data: 
+                missing_fields.append(field)
+
+        if len(missing_fields) > 0:
+            return Response({"missing_fields": missing_fields})
+        
+        existing_user = False
+
+        try:
+            User.objects.get(username=request.data['username'])
+            existing_user = True
+        except:
+            pass
+        
+        if existing_user:
+            return Response({"status": 400, "message": "Username already registered"})
+
+        try:
+            parse(request.data['birth_date'])    
+        except:
+            return Response({"date_format": "Expected yyyy-mm-dd"})
+        data = request.data
+        new_user = User.objects.create_user(data['username'], None, str(data['password']))
+        new_user.first_name = data['first_name']
+        new_user.last_name = data['last_name']
+        new_user.profile.birth_date = data['birth_date']
+        
+        new_user.save()
+        new_user.profile.save()
+
+        user_serializer = UserSerializer(new_user)
+        user_data = user_serializer.data
+
+        return Response({"status": 201, "data": user_data})
 
 
 class TranslateAPIView(APIView):
@@ -114,3 +175,26 @@ class TranslateAPIView(APIView):
                     word_object.translations_count = word_object.translations_count + 1
                     word_object.save()
         return Response(response)
+
+
+import openpyxl
+from pathlib import Path
+
+
+def upload_dictionarie(request):
+    # Setting the path to the xlsx file:
+    xlsx_file = Path('diccionario.xlsx')
+
+    wb_obj = openpyxl.load_workbook(xlsx_file)
+    wsheet = wb_obj.active
+
+    col_kiche = 'A'
+    col_spanish = 'B'
+
+    row = 1
+    while row < 85:
+        Word.objects.create(
+            spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip(),
+            kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip(),
+        )
+        row += 1
