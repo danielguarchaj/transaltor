@@ -40,7 +40,7 @@ class UserAPIView(APIView):
                 missing_fields.append(field)
 
         if len(missing_fields) > 0:
-            return Response({"missing_fields": missing_fields})
+            return Response({"status": 400, "message": "missing fields", "missing_fields": missing_fields})
         
         existing_user = False
 
@@ -56,7 +56,7 @@ class UserAPIView(APIView):
         try:
             parse(request.data['birth_date'])    
         except:
-            return Response({"date_format": "Expected yyyy-mm-dd"})
+            return Response({"status": 400, "message": "Invalid date format. Expected: yyyy-mm-dd"})
         data = request.data
         new_user = User.objects.create_user(data['username'], None, str(data['password']))
         new_user.first_name = data['first_name']
