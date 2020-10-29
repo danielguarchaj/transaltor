@@ -257,7 +257,7 @@ def upload_dictionary(request):
     col_spanish = 'B'
 
     row = 2
-    while row < 269:
+    while row < 932:
         Word.objects.create(
             spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
             kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
