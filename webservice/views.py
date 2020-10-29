@@ -166,7 +166,7 @@ class TranslateAPIView(APIView):
     def post(self, request, *args, **kwargs):
         response = {}
         translated_from = request.data['translated_from']
-        text = request.data['text']
+        text = request.data['text'].strip()
         single_word = request.data['single_word']
         user = request.user if request.user.is_authenticated else None
         try:
@@ -206,6 +206,7 @@ class TranslateAPIView(APIView):
             translated_words = []
             failed_translation = False
             for word in words:
+                word = word.strip()
                 matches = Word.objects.filter(spanish__icontains=word) if translated_from == 1 else Word.objects.filter(kiche__icontains=word)
                 word_translation = self.get_translation(word, matches, translated_from)
                 if word_translation == 'failed-translation':
@@ -247,7 +248,7 @@ from pathlib import Path
 
 def upload_dictionary(request):
     # Setting the path to the xlsx file:
-    xlsx_file = Path('diccionario.xlsx')
+    xlsx_file = Path('dictionary.xlsx')
 
     wb_obj = openpyxl.load_workbook(xlsx_file)
     wsheet = wb_obj.active
@@ -255,10 +256,10 @@ def upload_dictionary(request):
     col_kiche = 'A'
     col_spanish = 'B'
 
-    row = 1
-    while row < 85:
+    row = 2
+    while row < 269:
         Word.objects.create(
-            spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip(),
-            kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip(),
+            spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
+            kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
         )
         row += 1

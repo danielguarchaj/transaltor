@@ -29,7 +29,11 @@ class Word(models.Model):
     image = models.ImageField(upload_to='traductor/palabras_imagenes/', null=True, blank=True)
 
     def __str__(self):
-        return f'{self.spanish} - {self.kiche}'
+        try:
+            url = self.image.url
+        except:
+            url = 'No tiene imagen'
+        return f'{self.spanish} - {self.kiche} - {url}'
 
 
 class Translation(models.Model):
