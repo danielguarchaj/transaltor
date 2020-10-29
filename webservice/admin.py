@@ -5,9 +5,11 @@ from .models import (
     Translation,
     WordTranslated,
     FailedTranslation,
+    Profile,
 )
 
 admin.site.register(Word)
 admin.site.register(Translation)
 admin.site.register(WordTranslated)
 admin.site.register(FailedTranslation)
+admin.site.register(Profile)

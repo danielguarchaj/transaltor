@@ -48,7 +48,11 @@ class Translation(models.Model):
 
     def __str__(self):
         translated_from = "Español to Kiche" if self.translated_from == 1 else "Kiche to Español"
-        return f'Translated by: {self.user.username} - Single word: {self.single_word} - Translated from: {translated_from}'
+        try:
+            username = self.user.username
+        except:
+            username = 'Anonymous User'
+        return f'Translated by: {username} - Single word: {self.single_word} - Translated from: {translated_from}'
 
 
 class WordTranslated(models.Model):
