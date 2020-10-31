@@ -242,25 +242,25 @@ class TranslateAPIView(APIView):
         return Response(response)
 
 
-import openpyxl
-from pathlib import Path
+# import openpyxl
+# from pathlib import Path
 
 
-def upload_dictionary(request):
-    # Setting the path to the xlsx file:
-    xlsx_file = Path('dictionary.xlsx')
+# def upload_dictionary(request):
+#     # Setting the path to the xlsx file:
+#     xlsx_file = Path('dictionary.xlsx')
 
-    wb_obj = openpyxl.load_workbook(xlsx_file)
-    wsheet = wb_obj.active
+#     wb_obj = openpyxl.load_workbook(xlsx_file)
+#     wsheet = wb_obj.active
 
-    col_kiche = 'A'
-    col_spanish = 'B'
+#     col_kiche = 'A'
+#     col_spanish = 'B'
 
-    row = 2
-    while row < 466:
-        Word.objects.create(
-            spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
-            kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
-        )
-        print(row)
-        row += 1
+#     row = 2
+#     while row < 466:
+#         Word.objects.create(
+#             spanish = str(wsheet[f'{col_spanish}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
+#             kiche = str(wsheet[f'{col_kiche}{row}'].value).lower().strip().replace('; ', ';').replace('’', "'"),
+#         )
+#         print(row)
+#         row += 1
