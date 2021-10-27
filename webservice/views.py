@@ -59,14 +59,14 @@ class FailedTranslationsListAPIView(ListAPIView):
     serializer_class = FailedTranslationSerializer
     permission_classes = (IsAuthenticated, )
     queryset = FailedTranslation.objects.all()
-    pagination_class = DefaultPagination
+    # pagination_class = DefaultPagination
 
 
 class WordListAPIView(ListAPIView):
     serializer_class = WordSerializer
     permission_classes = (IsAuthenticated, )
     queryset = Word.objects.all()
-    pagination_class = DefaultPagination
+    # pagination_class = DefaultPagination
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
